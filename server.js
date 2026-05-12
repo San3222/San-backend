@@ -25,22 +25,29 @@ mongoose.connect(process.env.MONGODB_URI, {
 
 // Schema
 const contactSchema = new mongoose.Schema({
-    name:      { type: String, required: true, trim: true },
-    email:     { type: String, required: true, trim: true },
-    subject:   { type: String, required: true, trim: true },
-    message:   { type: String, required: true, trim: true },
+    name: { type: String, required: true, trim: true },
+    email: { type: String, required: true, trim: true },
+    subject: { type: String, required: true, trim: true },
+    message: { type: String, required: true, trim: true },
     createdAt: { type: Date, default: Date.now },
-    status:    { type: String, default: 'unread' }
+    status: { type: String, default: 'unread' }
 });
 
 const Contact = mongoose.model('Contact', contactSchema);
 
 // Nodemailer transporter
+// Nodemailer transporter — IPv4 force karo
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',      // service ki jagah host use karo
+    port: 587,
+    secure: false,               // TLS
+    family: 4,                   // ← IPv4 force karo
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
+    },
+    tls: {
+        rejectUnauthorized: false
     }
 });
 
@@ -132,17 +139,17 @@ app.post('/api/contact', async (req, res) => {
         const { name, email, subject, message } = req.body;
 
         if (!name || !email || !subject || !message) {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'All fields are required' 
+            return res.status(400).json({
+                success: false,
+                message: 'All fields are required'
             });
         }
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'Invalid email format' 
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid email format'
             });
         }
 
@@ -159,15 +166,15 @@ app.post('/api/contact', async (req, res) => {
             // Email fail ho to bhi success return karo — data save ho gaya
         }
 
-        res.status(201).json({ 
-            success: true, 
-            message: 'Message sent successfully' 
+        res.status(201).json({
+            success: true,
+            message: 'Message sent successfully'
         });
 
     } catch (error) {
         console.error('Detailed Error:', error.message);
-        res.status(500).json({ 
-            success: false, 
+        res.status(500).json({
+            success: false,
             message: 'Server error',
             detail: error.message
         });
