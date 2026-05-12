@@ -23,12 +23,12 @@ mongoose.connect(process.env.MONGODB_URI, {
     .catch(err => console.error('MongoDB Error:', err.message));
 
 const contactSchema = new mongoose.Schema({
-    name:      { type: String, required: true, trim: true },
-    email:     { type: String, required: true, trim: true },
-    subject:   { type: String, required: true, trim: true },
-    message:   { type: String, required: true, trim: true },
+    name: { type: String, required: true, trim: true },
+    email: { type: String, required: true, trim: true },
+    subject: { type: String, required: true, trim: true },
+    message: { type: String, required: true, trim: true },
     createdAt: { type: Date, default: Date.now },
-    status:    { type: String, default: 'unread' }
+    status: { type: String, default: 'unread' }
 });
 
 const Contact = mongoose.model('Contact', contactSchema);
@@ -39,7 +39,7 @@ async function sendEmailNotification(contactData) {
 
     const { data, error } = await resend.emails.send({
         from: 'Portfolio <onboarding@resend.dev>',  // free tier mein yahi use hoga
-        to: 'sandeebncs@gmail.com',
+        to: process.env.TO_EMAIL,
         subject: `📬 New Contact: ${subject} (from ${name})`,
         html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #f8fafc; padding: 20px; border-radius: 12px;">
