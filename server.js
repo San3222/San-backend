@@ -6,11 +6,20 @@ require('dotenv').config();
 const app = express();
 
 // Middleware
+// app.use(cors({
+//     origin: [process.env.FRONTEND_URL,],
+//     methods: ['GET', 'POST'],
+//     credentials: true
+// }));
+
+// Pehle wala CORS hatao, yeh lagao
 app.use(cors({
-    origin: [process.env.FRONTEND_URL,],
-    methods: ['GET', 'POST'],
-    credentials: true
+    origin: '*',  // sabke liye allow
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+app.options('*', cors()); // preflight handle
 
 // app.use(cors({
 //     origin: function (origin, callback) {
