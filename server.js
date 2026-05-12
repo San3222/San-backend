@@ -39,8 +39,8 @@ async function sendEmailNotification(contactData) {
 
     const { data, error } = await resend.emails.send({
         from: 'Portfolio <onboarding@resend.dev>',  // free tier mein yahi use hoga
-        to: 'sandeepncs@gmail.com',
-        subject: `📬 New Contact: ${subject}`,
+        to: 'sandeebncs@gmail.com',
+        subject: `📬 New Contact: ${subject} (from ${name})`,
         html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #f8fafc; padding: 20px; border-radius: 12px;">
             
