@@ -38,76 +38,115 @@ async function sendEmailNotification(contactData) {
     const { name, email, subject, message } = contactData;
 
     const { data, error } = await resend.emails.send({
-        from: 'Portfolio <onboarding@resend.dev>',  // free tier mein yahi use hoga
+        from: 'Portfolio <onboarding@resend.dev>',
         to: process.env.TO_EMAIL,
-        subject: `📬 New Contact: ${subject} (from ${name})`,
+        subject: `📬 New Contact: ${subject}`,
         html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #f8fafc; padding: 20px; border-radius: 12px;">
-            
-            <div style="background: linear-gradient(135deg, #3b82f6, #8b5cf6); padding: 24px; border-radius: 10px 10px 0 0; text-align: center;">
-                <h1 style="color: white; margin: 0; font-size: 22px;">📩 New Contact Form Submission</h1>
-                <p style="color: rgba(255,255,255,0.85); margin: 6px 0 0; font-size: 13px;">From your Portfolio Website</p>
-            </div>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Contact</title>
+</head>
+<body style="margin:0; padding:0; background:#f1f5f9; font-family: Arial, sans-serif;">
 
-            <div style="background: white; padding: 28px; border-radius: 0 0 10px 10px; border: 1px solid #e5e7eb;">
-                <table style="width: 100%; border-collapse: collapse;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background:#f1f5f9; padding: 24px 12px;">
+        <tr>
+            <td align="center">
+                <table width="100%" cellpadding="0" cellspacing="0" style="max-width:560px; border-radius:16px; overflow:hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.10);">
+                    
+                    <!-- Header -->
                     <tr>
-                        <td style="padding: 12px 0; border-bottom: 1px solid #f1f5f9; width: 30%;">
-                            <span style="color: #6b7280; font-size: 13px; font-weight: 600;">👤 NAME</span>
-                        </td>
-                        <td style="padding: 12px 0; border-bottom: 1px solid #f1f5f9;">
-                            <span style="color: #1f2937; font-size: 15px; font-weight: 600;">${name}</span>
+                        <td style="background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); padding: 32px 24px; text-align:center;">
+                            <div style="font-size:36px; margin-bottom:10px;">📩</div>
+                            <h1 style="color:white; margin:0; font-size:20px; font-weight:700; letter-spacing:0.5px;">New Contact Form Submission</h1>
+                            <p style="color:rgba(255,255,255,0.80); margin:8px 0 0; font-size:13px;">From your Portfolio Website</p>
                         </td>
                     </tr>
+
+                    <!-- Body -->
                     <tr>
-                        <td style="padding: 12px 0; border-bottom: 1px solid #f1f5f9;">
-                            <span style="color: #6b7280; font-size: 13px; font-weight: 600;">📧 EMAIL</span>
-                        </td>
-                        <td style="padding: 12px 0; border-bottom: 1px solid #f1f5f9;">
-                            <a href="mailto:${email}" style="color: #3b82f6; font-size: 15px; text-decoration: none;">${email}</a>
+                        <td style="background:#ffffff; padding: 28px 24px;">
+
+                            <!-- Name -->
+                            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">
+                                <tr>
+                                    <td style="background:#f8fafc; border-radius:10px; padding:14px 16px; border-left: 4px solid #3b82f6;">
+                                        <p style="margin:0 0 4px; font-size:11px; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:1px;">👤 Name</p>
+                                        <p style="margin:0; font-size:16px; font-weight:700; color:#1f2937;">${name}</p>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- Email -->
+                            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">
+                                <tr>
+                                    <td style="background:#f8fafc; border-radius:10px; padding:14px 16px; border-left: 4px solid #8b5cf6;">
+                                        <p style="margin:0 0 4px; font-size:11px; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:1px;">📧 Email</p>
+                                        <a href="mailto:${email}" style="margin:0; font-size:15px; font-weight:600; color:#3b82f6; text-decoration:none;">${email}</a>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- Subject -->
+                            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">
+                                <tr>
+                                    <td style="background:#f8fafc; border-radius:10px; padding:14px 16px; border-left: 4px solid #10b981;">
+                                        <p style="margin:0 0 4px; font-size:11px; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:1px;">📌 Subject</p>
+                                        <p style="margin:0; font-size:15px; font-weight:600; color:#1f2937;">${subject}</p>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- Message -->
+                            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+                                <tr>
+                                    <td style="background:#f8fafc; border-radius:10px; padding:14px 16px; border-left: 4px solid #f59e0b;">
+                                        <p style="margin:0 0 8px; font-size:11px; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:1px;">💬 Message</p>
+                                        <p style="margin:0; font-size:14px; color:#374151; line-height:1.7;">${message.replace(/\n/g, '<br>')}</p>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!-- Reply Button -->
+                            <table width="100%" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td align="center">
+                                        <a href="mailto:${email}?subject=Re: ${subject}" 
+                                           style="display:inline-block; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color:white; padding:14px 32px; border-radius:10px; text-decoration:none; font-weight:700; font-size:15px;">
+                                            ↩️ Reply to ${name}
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+
                         </td>
                     </tr>
+
+                    <!-- Footer -->
                     <tr>
-                        <td style="padding: 12px 0; border-bottom: 1px solid #f1f5f9;">
-                            <span style="color: #6b7280; font-size: 13px; font-weight: 600;">📌 SUBJECT</span>
-                        </td>
-                        <td style="padding: 12px 0; border-bottom: 1px solid #f1f5f9;">
-                            <span style="color: #1f2937; font-size: 15px;">${subject}</span>
+                        <td style="background:#f8fafc; padding:16px 24px; text-align:center; border-top:1px solid #e5e7eb;">
+                            <p style="margin:0; color:#9ca3af; font-size:12px;">
+                                Received from <strong style="color:#6b7280;">san3222.github.io</strong>
+                            </p>
+                            <p style="margin:4px 0 0; color:#9ca3af; font-size:11px;">
+                                ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} IST
+                            </p>
                         </td>
                     </tr>
-                    <tr>
-                        <td style="padding: 14px 0; vertical-align: top;">
-                            <span style="color: #6b7280; font-size: 13px; font-weight: 600;">💬 MESSAGE</span>
-                        </td>
-                        <td style="padding: 14px 0;">
-                            <div style="background: #f8fafc; padding: 14px; border-radius: 8px; border-left: 3px solid #3b82f6; color: #374151; font-size: 14px; line-height: 1.7;">
-                                ${message.replace(/\n/g, '<br>')}
-                            </div>
-                        </td>
-                    </tr>
+
                 </table>
+            </td>
+        </tr>
+    </table>
 
-                <div style="text-align: center; margin-top: 24px;">
-                    <a href="mailto:${email}?subject=Re: ${subject}" 
-                       style="background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: white; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; display: inline-block;">
-                        ↩️ Reply to ${name}
-                    </a>
-                </div>
-
-                <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #e5e7eb; text-align: center;">
-                    <p style="color: #9ca3af; font-size: 12px; margin: 0;">
-                        Received from <strong>san3222.github.io</strong> • ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} IST
-                    </p>
-                </div>
-            </div>
-        </div>
+</body>
+</html>
         `
     });
 
-    if (error) {
-        throw new Error(error.message);
-    }
-
+    if (error) throw new Error(error.message);
     console.log('Email sent ✅', data);
 }
 
