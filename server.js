@@ -38,9 +38,17 @@ app.use(cors({
 app.use(express.json());
 
 // MongoDB Connection
-mongoose.connect(process.env.MONGODB_URI)
-    .then(() => console.log('MongoDB Connected'))
-    .catch(err => console.error('MongoDB Error:', err));
+// mongoose.connect(process.env.MONGODB_URI)
+//     .then(() => console.log('MongoDB Connected'))
+//     .catch(err => console.error('MongoDB Error:', err));
+// MongoDB Connection
+mongoose.connect(process.env.MONGODB_URI, {
+    serverSelectionTimeoutMS: 30000,
+    socketTimeoutMS: 45000,
+    connectTimeoutMS: 30000,
+})
+    .then(() => console.log('MongoDB Connected ✅'))
+    .catch(err => console.error('MongoDB Error:', err.message));
 
 // Schema
 const contactSchema = new mongoose.Schema({
