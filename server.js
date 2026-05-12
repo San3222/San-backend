@@ -40,106 +40,54 @@ async function sendEmailNotification(contactData) {
     const { data, error } = await resend.emails.send({
         from: 'Portfolio <onboarding@resend.dev>',
         to: process.env.TO_EMAIL,
-        subject: `📬 New Contact: ${subject}`,
+        subject: `New Contact: ${subject}`,
         html: `
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New Contact</title>
 </head>
-<body style="margin:0; padding:0; background:#f1f5f9; font-family: Arial, sans-serif;">
+<body style="margin:0; padding:20px; background:#ffffff; font-family: Arial, sans-serif; color:#333333;">
 
-    <table width="100%" cellpadding="0" cellspacing="0" style="background:#f1f5f9; padding: 24px 12px;">
+    <h2 style="margin:0 0 8px;">New Contact Form Submission</h2>
+    <p style="margin:0 0 20px; color:#666666; font-size:14px;">From your Portfolio Website — san3222.github.io</p>
+
+    <hr style="border:none; border-top:1px solid #dddddd; margin-bottom:20px;">
+
+    <table cellpadding="0" cellspacing="0" style="width:100%; border-collapse:collapse;">
+        <tr style="background:#f5f5f5;">
+            <td style="padding:10px 14px; font-size:13px; font-weight:bold; color:#555555; width:100px; border:1px solid #dddddd;">Name</td>
+            <td style="padding:10px 14px; font-size:14px; color:#222222; border:1px solid #dddddd;">${name}</td>
+        </tr>
         <tr>
-            <td align="center">
-                <table width="100%" cellpadding="0" cellspacing="0" style="max-width:560px; border-radius:16px; overflow:hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.10);">
-                    
-                    <!-- Header -->
-                    <tr>
-                        <td style="background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); padding: 32px 24px; text-align:center;">
-                            <div style="font-size:36px; margin-bottom:10px;">📩</div>
-                            <h1 style="color:white; margin:0; font-size:20px; font-weight:700; letter-spacing:0.5px;">New Contact Form Submission</h1>
-                            <p style="color:rgba(255,255,255,0.80); margin:8px 0 0; font-size:13px;">From your Portfolio Website</p>
-                        </td>
-                    </tr>
-
-                    <!-- Body -->
-                    <tr>
-                        <td style="background:#ffffff; padding: 28px 24px;">
-
-                            <!-- Name -->
-                            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">
-                                <tr>
-                                    <td style="background:#f8fafc; border-radius:10px; padding:14px 16px; border-left: 4px solid #3b82f6;">
-                                        <p style="margin:0 0 4px; font-size:11px; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:1px;">👤 Name</p>
-                                        <p style="margin:0; font-size:16px; font-weight:700; color:#1f2937;">${name}</p>
-                                    </td>
-                                </tr>
-                            </table>
-
-                            <!-- Email -->
-                            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">
-                                <tr>
-                                    <td style="background:#f8fafc; border-radius:10px; padding:14px 16px; border-left: 4px solid #8b5cf6;">
-                                        <p style="margin:0 0 4px; font-size:11px; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:1px;">📧 Email</p>
-                                        <a href="mailto:${email}" style="margin:0; font-size:15px; font-weight:600; color:#3b82f6; text-decoration:none;">${email}</a>
-                                    </td>
-                                </tr>
-                            </table>
-
-                            <!-- Subject -->
-                            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">
-                                <tr>
-                                    <td style="background:#f8fafc; border-radius:10px; padding:14px 16px; border-left: 4px solid #10b981;">
-                                        <p style="margin:0 0 4px; font-size:11px; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:1px;">📌 Subject</p>
-                                        <p style="margin:0; font-size:15px; font-weight:600; color:#1f2937;">${subject}</p>
-                                    </td>
-                                </tr>
-                            </table>
-
-                            <!-- Message -->
-                            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
-                                <tr>
-                                    <td style="background:#f8fafc; border-radius:10px; padding:14px 16px; border-left: 4px solid #f59e0b;">
-                                        <p style="margin:0 0 8px; font-size:11px; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:1px;">💬 Message</p>
-                                        <p style="margin:0; font-size:14px; color:#374151; line-height:1.7;">${message.replace(/\n/g, '<br>')}</p>
-                                    </td>
-                                </tr>
-                            </table>
-
-                            <!-- Reply Button -->
-                            <table width="100%" cellpadding="0" cellspacing="0">
-                                <tr>
-                                    <td align="center">
-                                        <a href="mailto:${email}?subject=Re: ${subject}" 
-                                           style="display:inline-block; background: linear-gradient(135deg, #3b82f6, #8b5cf6); color:white; padding:14px 32px; border-radius:10px; text-decoration:none; font-weight:700; font-size:15px;">
-                                            ↩️ Reply to ${name}
-                                        </a>
-                                    </td>
-                                </tr>
-                            </table>
-
-                        </td>
-                    </tr>
-
-                    <!-- Footer -->
-                    <tr>
-                        <td style="background:#f8fafc; padding:16px 24px; text-align:center; border-top:1px solid #e5e7eb;">
-                            <p style="margin:0; color:#9ca3af; font-size:12px;">
-                                Received from <strong style="color:#6b7280;">san3222.github.io</strong>
-                            </p>
-                            <p style="margin:4px 0 0; color:#9ca3af; font-size:11px;">
-                                ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} IST
-                            </p>
-                        </td>
-                    </tr>
-
-                </table>
+            <td style="padding:10px 14px; font-size:13px; font-weight:bold; color:#555555; border:1px solid #dddddd;">Email</td>
+            <td style="padding:10px 14px; font-size:14px; border:1px solid #dddddd;">
+                <a href="mailto:${email}" style="color:#1a73e8; text-decoration:none;">${email}</a>
+            </td>
+        </tr>
+        <tr style="background:#f5f5f5;">
+            <td style="padding:10px 14px; font-size:13px; font-weight:bold; color:#555555; border:1px solid #dddddd;">Subject</td>
+            <td style="padding:10px 14px; font-size:14px; color:#222222; border:1px solid #dddddd;">${subject}</td>
+        </tr>
+        <tr>
+            <td style="padding:10px 14px; font-size:13px; font-weight:bold; color:#555555; vertical-align:top; border:1px solid #dddddd;">Message</td>
+            <td style="padding:10px 14px; font-size:14px; color:#222222; line-height:1.6; border:1px solid #dddddd;">
+                ${message.replace(/\n/g, '<br>')}
             </td>
         </tr>
     </table>
+
+    <br>
+    <a href="mailto:${email}?subject=Re: ${subject}" 
+       style="display:inline-block; padding:10px 22px; background:#1a73e8; color:#ffffff; text-decoration:none; font-size:14px; border-radius:4px;">
+        Reply to ${name}
+    </a>
+
+    <hr style="border:none; border-top:1px solid #dddddd; margin-top:24px;">
+    <p style="font-size:12px; color:#999999; margin:8px 0 0;">
+        ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} IST
+    </p>
 
 </body>
 </html>
