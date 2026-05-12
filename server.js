@@ -1,12 +1,12 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 require('dotenv').config();
 
 const app = express();
+const resend = new Resend(process.env.RESEND_API_KEY);
 
-// Middleware
 app.use(cors({
     origin: '*',
     methods: ['GET', 'POST', 'OPTIONS'],
@@ -14,7 +14,6 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// MongoDB Connection
 mongoose.connect(process.env.MONGODB_URI, {
     serverSelectionTimeoutMS: 30000,
     socketTimeoutMS: 45000,
@@ -23,54 +22,34 @@ mongoose.connect(process.env.MONGODB_URI, {
     .then(() => console.log('MongoDB Connected ✅'))
     .catch(err => console.error('MongoDB Error:', err.message));
 
-// Schema
 const contactSchema = new mongoose.Schema({
-    name: { type: String, required: true, trim: true },
-    email: { type: String, required: true, trim: true },
-    subject: { type: String, required: true, trim: true },
-    message: { type: String, required: true, trim: true },
+    name:      { type: String, required: true, trim: true },
+    email:     { type: String, required: true, trim: true },
+    subject:   { type: String, required: true, trim: true },
+    message:   { type: String, required: true, trim: true },
     createdAt: { type: Date, default: Date.now },
-    status: { type: String, default: 'unread' }
+    status:    { type: String, default: 'unread' }
 });
 
 const Contact = mongoose.model('Contact', contactSchema);
 
-// Nodemailer transporter
-// Nodemailer transporter — IPv4 force karo
-const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',      // service ki jagah host use karo
-    port: 587,
-    secure: false,               // TLS
-    family: 4,                   // ← IPv4 force karo
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-    },
-    tls: {
-        rejectUnauthorized: false
-    }
-});
-
-// Email sending function
+// Email function — Resend
 async function sendEmailNotification(contactData) {
     const { name, email, subject, message } = contactData;
 
-    const mailOptions = {
-        from: `"Portfolio Contact" <${process.env.EMAIL_USER}>`,
+    const { data, error } = await resend.emails.send({
+        from: 'Portfolio <onboarding@resend.dev>',  // free tier mein yahi use hoga
         to: 'sandeepncs@gmail.com',
         subject: `📬 New Contact: ${subject}`,
         html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #f8fafc; padding: 20px; border-radius: 12px;">
             
-            <!-- Header -->
             <div style="background: linear-gradient(135deg, #3b82f6, #8b5cf6); padding: 24px; border-radius: 10px 10px 0 0; text-align: center;">
                 <h1 style="color: white; margin: 0; font-size: 22px;">📩 New Contact Form Submission</h1>
                 <p style="color: rgba(255,255,255,0.85); margin: 6px 0 0; font-size: 13px;">From your Portfolio Website</p>
             </div>
 
-            <!-- Body -->
             <div style="background: white; padding: 28px; border-radius: 0 0 10px 10px; border: 1px solid #e5e7eb;">
-                
                 <table style="width: 100%; border-collapse: collapse;">
                     <tr>
                         <td style="padding: 12px 0; border-bottom: 1px solid #f1f5f9; width: 30%;">
@@ -108,7 +87,6 @@ async function sendEmailNotification(contactData) {
                     </tr>
                 </table>
 
-                <!-- Reply Button -->
                 <div style="text-align: center; margin-top: 24px;">
                     <a href="mailto:${email}?subject=Re: ${subject}" 
                        style="background: linear-gradient(135deg, #3b82f6, #8b5cf6); color: white; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; display: inline-block;">
@@ -116,7 +94,6 @@ async function sendEmailNotification(contactData) {
                     </a>
                 </div>
 
-                <!-- Footer -->
                 <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #e5e7eb; text-align: center;">
                     <p style="color: #9ca3af; font-size: 12px; margin: 0;">
                         Received from <strong>san3222.github.io</strong> • ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} IST
@@ -125,59 +102,45 @@ async function sendEmailNotification(contactData) {
             </div>
         </div>
         `
-    };
+    });
 
-    await transporter.sendMail(mailOptions);
-    console.log('Email sent ✅');
+    if (error) {
+        throw new Error(error.message);
+    }
+
+    console.log('Email sent ✅', data);
 }
 
-// POST — Save contact form + send email
+// POST — Save + Email
 app.post('/api/contact', async (req, res) => {
     try {
         console.log('Request body:', req.body);
-
         const { name, email, subject, message } = req.body;
 
         if (!name || !email || !subject || !message) {
-            return res.status(400).json({
-                success: false,
-                message: 'All fields are required'
-            });
+            return res.status(400).json({ success: false, message: 'All fields are required' });
         }
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
-            return res.status(400).json({
-                success: false,
-                message: 'Invalid email format'
-            });
+            return res.status(400).json({ success: false, message: 'Invalid email format' });
         }
 
-        // 1. MongoDB mein save karo
         const newContact = new Contact({ name, email, subject, message });
         await newContact.save();
         console.log('Saved to MongoDB ✅');
 
-        // 2. Email bhejo (save fail nahi karta agar email fail ho)
         try {
             await sendEmailNotification({ name, email, subject, message });
         } catch (emailError) {
             console.error('Email failed:', emailError.message);
-            // Email fail ho to bhi success return karo — data save ho gaya
         }
 
-        res.status(201).json({
-            success: true,
-            message: 'Message sent successfully'
-        });
+        res.status(201).json({ success: true, message: 'Message sent successfully' });
 
     } catch (error) {
         console.error('Detailed Error:', error.message);
-        res.status(500).json({
-            success: false,
-            message: 'Server error',
-            detail: error.message
-        });
+        res.status(500).json({ success: false, message: 'Server error', detail: error.message });
     }
 });
 
@@ -191,7 +154,6 @@ app.get('/api/contacts', async (req, res) => {
     }
 });
 
-// Health check
 app.get('/', (req, res) => res.json({ status: 'API running ✅' }));
 
 const PORT = process.env.PORT || 5000;
